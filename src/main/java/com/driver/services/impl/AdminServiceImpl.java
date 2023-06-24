@@ -1,5 +1,7 @@
 package com.driver.services.impl;
 
+import com.driver.model.Admin;
+import com.driver.model.ServiceProvider;
 import com.driver.repository.AdminRepository;
 import com.driver.repository.CountryRepository;
 import com.driver.repository.ServiceProviderRepository;
