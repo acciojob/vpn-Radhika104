@@ -25,9 +25,7 @@ public class ConnectionServiceImpl implements ConnectionService {
       CountryName countryName1=CountryName.valueOf(countryName.toUpperCase());
       if(user.getConnected()) throw new Exception("Already connected");
       else if(countryName1.equals(user.getOriginalCountry())) return user;
-
-      if(user.getServiceProviderList().isEmpty()) throw new Exception("Unable to connect");
-
+      
       List<ServiceProvider> serviceProviderList=user.getServiceProviderList();
       int lowestId=Integer.MIN_VALUE;
       ServiceProvider serviceProvider=null;
