@@ -62,10 +62,42 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
     @Override
     public User disconnect(int userId) throws Exception {
-     return null;
+        User user=userRepository2.findById(userId).get();
+        if(!user.getConnected()) throw new Exception("Already disconnected");
+
+        user.setMaskedIp(null);
+        user.setConnected(Boolean.FALSE);
+        userRepository2.save(user);
+        return user;
     }
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
-         return null;
+        User receiver=userRepository2.findById(receiverId).get();
+        CountryName receiverCountryName=null;
+        if(receiver.getConnected()){
+            String maskedCode= receiver.getMaskedIp().substring(0,3);
+            if(maskedCode.equals("001"))
+                receiverCountryName=CountryName.IND;
+            else if(maskedCode.equals("002"))
+                receiverCountryName=CountryName.USA;
+            else if(maskedCode.equals("003"))
+                receiverCountryName=CountryName.AUS;
+            else if(maskedCode.equals("004"))
+                receiverCountryName=CountryName.CHI;
+            else if(maskedCode.equals("005"))
+                receiverCountryName=CountryName.JPN;
+        }
+        else{
+            receiverCountryName=receiver.getOriginalCountry().getCountryName();
+        }
+        User user=null;
+        try{
+            user=connect(senderId,receiverCountryName.toString());
+        }
+        catch(Exception e){
+            throw new Exception("Cannot establish communication");
+        }
+        return user;
+
     }
 }
