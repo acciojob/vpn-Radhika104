@@ -22,13 +22,16 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin register(String username, String password) {
+        return null;
     }
 
     @Override
     public Admin addServiceProvider(int adminId, String providerName) {
+        return null;
     }
 
     @Override
     public ServiceProvider addCountry(int serviceProviderId, String countryName) throws Exception{
+        return null;
     }
 }
