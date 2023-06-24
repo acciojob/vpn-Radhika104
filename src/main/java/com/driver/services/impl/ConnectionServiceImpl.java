@@ -21,7 +21,33 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public User connect(int userId, String countryName) throws Exception{
-      return null;
+      User user=userRepository2.findById(userId).get();
+      CountryName countryName1=CountryName.valueOf(countryName.toUpperCase());
+      if(user.getConnected()) throw new Exception("Already connected");
+      else if(countryName1.equals(user.getOriginalCountry())) return user;
+
+      if(user.getServiceProviderList().isEmpty()) throw new Exception("Unable to connect");
+
+      List<ServiceProvider> serviceProviderList=user.getServiceProviderList();
+      int lowestId=Integer.MIN_VALUE;
+      ServiceProvider serviceProvider=null;
+      for(ServiceProvider serviceProvider1:serviceProviderList)
+      {
+          for(Country country:serviceProvider1.getCountryList())
+          {
+              if(country.getCountryName().toString().equalsIgnoreCase(countryName))
+              {
+                  if(serviceProvider==null || lowestId>serviceProvider1.getId())
+                  {
+                      lowestId=serviceProvider1.getId();
+                      serviceProvider=serviceProvider1;
+                  }
+              }
+          }
+      }
+      if(serviceProvider==null) throw new Exception("Unable to connect");
+      return user;
+
     }
     @Override
     public User disconnect(int userId) throws Exception {
