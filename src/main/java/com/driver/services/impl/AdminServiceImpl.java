@@ -22,12 +22,22 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin register(String username, String password) {
-        return null;
+        Admin admin=new Admin();
+        admin.setUsername(username);
+        admin.setPassword(password);
+        adminRepository1.save(admin);
+        return admin;
     }
 
     @Override
     public Admin addServiceProvider(int adminId, String providerName) {
-        return null;
+        Admin admin=adminRepository1.findById(adminId).get();
+        ServiceProvider serviceProvider=new ServiceProvider();
+        serviceProvider.setAdmin(admin);
+        serviceProvider.setName(providerName);
+        admin.getServiceProviderList().add(serviceProvider);
+        adminRepository1.save(admin);
+        return admin;
     }
 
     @Override

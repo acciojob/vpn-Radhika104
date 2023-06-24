@@ -15,7 +15,8 @@ public class Country
 
     private  String code;
 
-    @OneToMany(mappedBy = "country",cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn
     private ServiceProvider serviceProvider;
 
     @OneToOne

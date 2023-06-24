@@ -19,15 +19,15 @@ public class User {
     private String maskedIp;
     private boolean connected;
 
+    @ManyToMany
+    @JoinColumn
+    private List<ServiceProvider> serviceProviderList=new ArrayList<>();
+
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Country country;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Connection> connectionList=new ArrayList<>();
-
-    @ManyToMany
-    @JoinColumn
-    private List<ServiceProvider> serviceProviderList=new ArrayList<>();
 
     public int getId() {
         return id;
