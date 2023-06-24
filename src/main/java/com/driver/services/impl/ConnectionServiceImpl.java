@@ -21,50 +21,47 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public User connect(int userId, String countryName) throws Exception{
-      User user=userRepository2.findById(userId).get();
-      CountryName countryName1=CountryName.valueOf(countryName.toUpperCase());
-      if(user.getConnected()) throw new Exception("Already connected");
-      else if(countryName1.equals(user.getOriginalCountry())) return user;
-      
-      List<ServiceProvider> serviceProviderList=user.getServiceProviderList();
-      int lowestId=Integer.MIN_VALUE;
-      ServiceProvider serviceProvider=null;
-      for(ServiceProvider serviceProvider1:serviceProviderList)
-      {
-          for(Country country:serviceProvider1.getCountryList())
-          {
-              if(country.getCountryName().toString().equalsIgnoreCase(countryName))
-              {
-                  if(serviceProvider==null || lowestId>serviceProvider1.getId())
-                  {
-                      lowestId=serviceProvider1.getId();
-                      serviceProvider=serviceProvider1;
-                  }
-              }
-          }
-      }
-      if(serviceProvider==null) throw new Exception("Unable to connect");
-      String maskedIp=countryName1.toCode()+"."+serviceProvider.getId()+"."+userId;
-      user.setMaskedIp(maskedIp);
-      user.setConnected(true);
-
-      Connection connection=new Connection();
-      connection.setUser(user);
-      connection.setServiceProvider(serviceProvider);
-      user.getConnectionList().add(connection);
-      serviceProvider.getConnectionList().add(connection);
-      userRepository2.save(user);
-      serviceProviderRepository2.save(serviceProvider);
-      return user;
-
+        User user=userRepository2.findById(userId).get();
+        if(user.getConnected()==true)
+            throw new Exception("Already connected");
+        else if(user.getOriginalCountry().getCountryName().toString().equalsIgnoreCase(countryName))
+            return user;
+        List<ServiceProvider> serviceProviders=user.getServiceProviderList();
+        ServiceProvider lowestServiceProvider=null;
+        int lowestId=Integer.MAX_VALUE;
+        for(ServiceProvider serviceProvider:serviceProviders){
+            List<Country> countries=serviceProvider.getCountryList();
+            for(Country country:countries){
+                if(countryName.equalsIgnoreCase(country.getCountryName().toString())){
+                    if(lowestServiceProvider==null || lowestId > serviceProvider.getId()){
+                        lowestId=serviceProvider.getId();
+                        lowestServiceProvider=serviceProvider;
+                    }
+                }
+            }
+        }
+        if(lowestServiceProvider==null)
+            throw new Exception("Unable to connect");
+        //make connection
+        String maskedIpAd=CountryName.valueOf(countryName.toUpperCase()).toCode()+"."+lowestServiceProvider.getId()+"."+userId;
+        user.setMaskedIp(maskedIpAd);
+        user.setConnected(true);
+        Connection connection=new Connection();
+        connection.setServiceProvider(lowestServiceProvider);
+        connection.setUser(user);
+        user.getConnectionList().add(connection);
+        lowestServiceProvider.getConnectionList().add(connection);
+        userRepository2.save(user);
+        serviceProviderRepository2.save(lowestServiceProvider);
+        return user;
     }
     @Override
     public User disconnect(int userId) throws Exception {
         User user=userRepository2.findById(userId).get();
-        if(!user.getConnected()) throw new Exception("Already disconnected");
-
-        user.setMaskedIp(null);
+        if(user.getConnected()==false)
+            throw new Exception("Already disconnected");
         user.setConnected(false);
+        user.setMaskedIp(null);
         userRepository2.save(user);
         return user;
     }
@@ -96,6 +93,5 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Cannot establish communication");
         }
         return user;
-
     }
 }
